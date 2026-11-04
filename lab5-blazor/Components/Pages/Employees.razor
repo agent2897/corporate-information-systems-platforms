@@ -1,0 +1,86 @@
+@page "/employees"
+@inject IDbContextFactory<ContractsContext> DbFactory
+
+<PageTitle>Працівники</PageTitle>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Працівники</h3>
+    <a href="employees/new" class="btn btn-success"><i class="bi bi-plus-lg"></i> Додати працівника</a>
+</div>
+<Toast @ref="toast" />
+
+<div class="row g-2 mb-3">
+    <div class="col-md-4">
+        @* Пошук «на льоту»: список оновлюється під час введення *@
+        <input class="form-control" placeholder="Пошук за прізвищем" @bind="search" @bind:event="oninput" @bind:after="Load" />
+    </div>
+    <div class="col-md-3">
+        <select class="form-select" @bind="positionId" @bind:after="Load">
+            <option value="0">Усі посади</option>
+            @foreach (var p in positions) { <option value="@p.Id">@p.Title</option> }
+        </select>
+    </div>
+    <div class="col-auto align-self-center text-muted">Знайдено: @list.Count</div>
+</div>
+
+<div class="card">
+<table class="table table-hover mb-0">
+    <thead class="table-light"><tr><th>ПІБ</th><th>Посада</th><th>Домашня адреса</th><th>Телефон</th><th class="text-center">Проектів</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var e in list)
+    {
+        <tr>
+            <td><a href="employees/@e.Id">@e.FullName</a></td>
+            <td>@e.Position.Title</td>
+            <td>@e.Address</td>
+            <td class="text-nowrap">@e.Phone</td>
+            <td class="text-center">@e.Participations.Count</td>
+            <td class="text-end text-nowrap">
+                <a href="employees/@e.Id" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                <button class="btn btn-sm btn-outline-danger" @onclick="() => toDelete = e"><i class="bi bi-trash"></i></button>
+            </td>
+        </tr>
+    }
+    @if (list.Count == 0) { <tr><td colspan="6" class="text-center text-muted py-4">Нічого не знайдено</td></tr> }
+    </tbody>
+</table>
+</div>
+
+<ConfirmDialog Visible="toDelete is not null" Title="Видалити працівника?"
+               Message="@($"{toDelete?.FullName} буде видалено разом із {toDelete?.Participations.Count} записами участі в проектах.")"
+               OnClose="Delete" />
+
+@code {
+    string search = "";
+    int positionId;
+    List<Employee> list = new();
+    List<Position> positions = new();
+    Employee? toDelete;
+    Toast toast = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        positions = await db.Positions.OrderBy(p => p.Title).ToListAsync();
+        await Load();
+    }
+
+    async Task Load()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var q = db.Employees.Include(e => e.Position).Include(e => e.Participations).AsNoTracking();
+        if (!string.IsNullOrWhiteSpace(search)) q = q.Where(e => EF.Functions.Like(e.LastName, search.Trim() + "%"));
+        if (positionId > 0) q = q.Where(e => e.PositionId == positionId);
+        list = await q.OrderBy(e => e.LastName).ToListAsync();
+    }
+
+    async Task Delete(bool confirmed)
+    {
+        var e = toDelete;
+        toDelete = null;
+        if (!confirmed || e is null) return;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        await db.Employees.Where(x => x.Id == e.Id).ExecuteDeleteAsync();
+        toast.Show($"Працівника «{e.FullName}» видалено");
+        await Load();
+    }
+}

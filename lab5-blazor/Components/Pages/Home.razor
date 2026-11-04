@@ -1,0 +1,49 @@
+@page "/"
+@inject IDbContextFactory<ContractsContext> DbFactory
+
+<PageTitle>Проектні договори</PageTitle>
+<h3 class="mb-3">Огляд бази даних</h3>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><a class="card p-3 text-decoration-none" href="employees"><div class="text-muted"><i class="bi bi-people"></i> Працівників</div><div class="fs-2 fw-bold text-dark">@employees</div></a></div>
+    <div class="col-md-3"><a class="card p-3 text-decoration-none" href="positions"><div class="text-muted"><i class="bi bi-person-badge"></i> Посад</div><div class="fs-2 fw-bold text-dark">@positions</div></a></div>
+    <div class="col-md-3"><a class="card p-3 text-decoration-none" href="projects"><div class="text-muted"><i class="bi bi-kanban"></i> Проектів</div><div class="fs-2 fw-bold text-dark">@projects</div></a></div>
+    <div class="col-md-3"><div class="card p-3"><div class="text-muted"><i class="bi bi-cash-stack"></i> Фонд окладів, грн</div><div class="fs-2 fw-bold">@fund.ToString("N0")</div></div></div>
+</div>
+
+<div class="card p-3">
+    <h5>Працівники, які працюють у двох проектах одночасно</h5>
+    <table class="table table-striped mb-0">
+        <thead><tr><th>ПІБ</th><th>Посада</th><th>Проекти (днів)</th><th class="text-end">Усього днів</th></tr></thead>
+        <tbody>
+        @foreach (var e in multi)
+        {
+            <tr>
+                <td><a href="employees/@e.Id">@e.FullName</a></td>
+                <td>@e.Position.Title</td>
+                <td>@string.Join("; ", e.Participations.Select(p => $"{p.Project.Name} ({p.DaysWorked})"))</td>
+                <td class="text-end">@e.Participations.Sum(p => p.DaysWorked)</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    int employees, positions, projects;
+    decimal fund;
+    List<Employee> multi = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        employees = await db.Employees.CountAsync();
+        positions = await db.Positions.CountAsync();
+        projects = await db.Projects.CountAsync();
+        fund = (await db.Employees.Select(e => e.Position.Salary).ToListAsync()).Sum();
+        multi = await db.Employees.Include(e => e.Position)
+            .Include(e => e.Participations).ThenInclude(p => p.Project)
+            .Where(e => e.Participations.Count >= 2).OrderBy(e => e.LastName)
+            .AsNoTracking().ToListAsync();
+    }
+}

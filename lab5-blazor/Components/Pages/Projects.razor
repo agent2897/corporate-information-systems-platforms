@@ -1,0 +1,104 @@
+@page "/projects"
+@inject IDbContextFactory<ContractsContext> DbFactory
+
+<PageTitle>Проекти</PageTitle>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Проекти</h3>
+    <button class="btn btn-success" @onclick="() => form = new Project()"><i class="bi bi-plus-lg"></i> Додати проект</button>
+</div>
+<Toast @ref="toast" />
+
+<div class="row g-3">
+@foreach (var p in list)
+{
+    <div class="col-md-6">
+        <div class="card p-3 h-100">
+            <h5><a href="projects/@p.Id">@p.Name</a></h5>
+            <div class="text-muted mb-2"><i class="bi bi-building"></i> @p.Customer</div>
+            <p>@p.Description</p>
+            <div class="mb-3">
+                <span class="badge text-bg-primary">@p.StartDate.ToString("dd.MM.yyyy") — @p.EndDate.ToString("dd.MM.yyyy")</span>
+                <span class="badge text-bg-secondary">@((p.EndDate - p.StartDate).Days) дн.</span>
+                <span class="badge text-bg-success"><i class="bi bi-people"></i> @p.Participations.Count учасн.</span>
+            </div>
+            <div class="mt-auto">
+                <a href="projects/@p.Id" class="btn btn-sm btn-outline-success"><i class="bi bi-people"></i> Учасники</a>
+                <button class="btn btn-sm btn-outline-primary" @onclick="() => form = Copy(p)"><i class="bi bi-pencil"></i> Редагувати</button>
+                <button class="btn btn-sm btn-outline-danger" @onclick="() => toDelete = p"><i class="bi bi-trash"></i> Видалити</button>
+            </div>
+        </div>
+    </div>
+}
+</div>
+
+@if (form is not null)
+{
+    <div class="modal-backdrop-custom">
+        <div class="card p-4" style="width: 720px">
+            <h5 class="mb-3">@(form.Id == 0 ? "Новий проект" : "Редагування проекту")</h5>
+            <EditForm Model="form" OnValidSubmit="Save" FormName="project">
+                <DataAnnotationsValidator />
+                <div class="row g-3">
+                    <div class="col-md-7"><label class="form-label">Назва проекту</label><InputText @bind-Value="form.Name" class="form-control" /><ValidationMessage For="() => form.Name" /></div>
+                    <div class="col-md-5"><label class="form-label">Замовник</label><InputText @bind-Value="form.Customer" class="form-control" /></div>
+                    <div class="col-md-6"><label class="form-label">Дата початку</label><InputDate @bind-Value="form.StartDate" class="form-control" /></div>
+                    <div class="col-md-6"><label class="form-label">Дата закінчення</label><InputDate @bind-Value="form.EndDate" class="form-control" /><ValidationMessage For="() => form.EndDate" /></div>
+                    <div class="col-12"><label class="form-label">Опис проекту</label><InputTextArea @bind-Value="form.Description" class="form-control" rows="3" /></div>
+                </div>
+                @if (error is not null) { <div class="text-danger mt-2">@error</div> }
+                <div class="text-end mt-4">
+                    <button type="button" class="btn btn-outline-secondary" @onclick="() => { form = null; error = null; }">Скасувати</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Зберегти</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<ConfirmDialog Visible="toDelete is not null" Title="Видалити проект?"
+               Message="@($"Проект «{toDelete?.Name}» буде видалено разом із {toDelete?.Participations.Count} записами участі.")"
+               OnClose="Delete" />
+
+@code {
+    List<Project> list = new();
+    Project? form, toDelete;
+    string? error;
+    Toast toast = null!;
+
+    protected override Task OnInitializedAsync() => Load();
+
+    async Task Load()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        list = await db.Projects.Include(p => p.Participations).OrderBy(p => p.StartDate).AsNoTracking().ToListAsync();
+    }
+
+    static Project Copy(Project p) => new()
+    {
+        Id = p.Id, Name = p.Name, Customer = p.Customer, Description = p.Description,
+        StartDate = p.StartDate, EndDate = p.EndDate,
+    };
+
+    async Task Save()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        if (await db.Projects.AnyAsync(x => x.Name == form!.Name && x.Id != form.Id))
+        { error = "Проект з такою назвою вже існує"; return; }
+        if (form!.Id == 0) db.Projects.Add(form); else db.Projects.Update(form);
+        await db.SaveChangesAsync();
+        toast.Show($"Проект «{form.Name}» збережено");
+        form = null; error = null;
+        await Load();
+    }
+
+    async Task Delete(bool confirmed)
+    {
+        var p = toDelete;
+        toDelete = null;
+        if (!confirmed || p is null) return;
+        await using var db = await DbFactory.CreateDbContextAsync();
+        await db.Projects.Where(x => x.Id == p.Id).ExecuteDeleteAsync();
+        toast.Show($"Проект «{p.Name}» видалено");
+        await Load();
+    }
+}

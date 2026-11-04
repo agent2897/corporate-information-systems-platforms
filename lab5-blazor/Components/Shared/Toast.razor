@@ -1,0 +1,19 @@
+@* Повідомлення про результат операції *@
+@if (!string.IsNullOrEmpty(Text))
+{
+    <div class="alert @(IsError ? "alert-danger" : "alert-success") d-flex justify-content-between">
+        <span><i class="bi @(IsError ? "bi-exclamation-triangle" : "bi-check-circle")"></i> @Text</span>
+        <button class="btn-close" @onclick="() => Text = null"></button>
+    </div>
+}
+
+@code {
+    public string? Text { get; private set; }
+    public bool IsError { get; private set; }
+
+    public void Show(string text, bool error = false)
+    {
+        Text = text; IsError = error;
+        StateHasChanged();
+    }
+}

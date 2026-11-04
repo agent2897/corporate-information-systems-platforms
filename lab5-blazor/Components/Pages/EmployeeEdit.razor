@@ -1,0 +1,90 @@
+@page "/employees/new"
+@page "/employees/{Id:int}"
+@inject IDbContextFactory<ContractsContext> DbFactory
+@inject NavigationManager Nav
+
+<PageTitle>@title</PageTitle>
+<h3 class="mb-3">@title</h3>
+
+@if (employee is null)
+{
+    <p class="text-muted">Завантаження…</p>
+}
+else
+{
+<div class="row g-4">
+<div class="col-lg-7">
+<div class="card p-4">
+    <EditForm Model="employee" OnValidSubmit="Save" FormName="employee">
+        <DataAnnotationsValidator />
+        <div class="row g-3">
+            <div class="col-md-4"><label class="form-label">Прізвище</label><InputText @bind-Value="employee.LastName" class="form-control" /><ValidationMessage For="() => employee.LastName" /></div>
+            <div class="col-md-4"><label class="form-label">Ім’я</label><InputText @bind-Value="employee.FirstName" class="form-control" /><ValidationMessage For="() => employee.FirstName" /></div>
+            <div class="col-md-4"><label class="form-label">По батькові</label><InputText @bind-Value="employee.MiddleName" class="form-control" /><ValidationMessage For="() => employee.MiddleName" /></div>
+            <div class="col-md-6">
+                <label class="form-label">Посада</label>
+                <InputSelect @bind-Value="employee.PositionId" class="form-select">
+                    <option value="0">— оберіть посаду —</option>
+                    @foreach (var p in positions) { <option value="@p.Id">@p.Title (@p.Salary.ToString("N0") грн)</option> }
+                </InputSelect>
+                <ValidationMessage For="() => employee.PositionId" />
+            </div>
+            <div class="col-md-6"><label class="form-label">Телефон</label><InputText @bind-Value="employee.Phone" class="form-control" placeholder="+380XXXXXXXXX" /><ValidationMessage For="() => employee.Phone" /></div>
+            <div class="col-12"><label class="form-label">Домашня адреса</label><InputText @bind-Value="employee.Address" class="form-control" /><ValidationMessage For="() => employee.Address" /></div>
+            <div class="col-12"><label class="form-label">Характеристика</label><InputTextArea @bind-Value="employee.Characteristic" class="form-control" rows="2" /></div>
+        </div>
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Зберегти</button>
+            <a href="employees" class="btn btn-outline-secondary">Скасувати</a>
+        </div>
+    </EditForm>
+</div>
+</div>
+@if (Id is not null)
+{
+<div class="col-lg-5">
+    <div class="card p-3">
+        <h5>Участь у проектах</h5>
+        <table class="table mb-0">
+            <thead><tr><th>Проект</th><th class="text-end">Днів</th></tr></thead>
+            <tbody>
+            @foreach (var p in participations)
+            {
+                <tr><td><a href="projects/@p.ProjectId">@p.Project.Name</a></td><td class="text-end">@p.DaysWorked</td></tr>
+            }
+            @if (participations.Count == 0) { <tr><td colspan="2" class="text-muted">Не бере участі в проектах</td></tr> }
+            </tbody>
+        </table>
+    </div>
+</div>
+}
+</div>
+}
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    Employee? employee;
+    List<Position> positions = new();
+    List<Participation> participations = new();
+    string title => Id is null ? "Новий працівник" : "Редагування працівника";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        positions = await db.Positions.OrderBy(p => p.Title).ToListAsync();
+        if (Id is null) { employee = new(); return; }
+        employee = await db.Employees.AsNoTracking().FirstOrDefaultAsync(e => e.Id == Id);
+        if (employee is null) { Nav.NavigateTo("employees"); return; }
+        participations = await db.Participations.Include(p => p.Project)
+            .Where(p => p.EmployeeId == Id).AsNoTracking().ToListAsync();
+    }
+
+    async Task Save()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        if (employee!.Id == 0) db.Employees.Add(employee);
+        else db.Employees.Update(employee);
+        await db.SaveChangesAsync();
+        Nav.NavigateTo("employees");
+    }
+}

@@ -1,0 +1,104 @@
+@page "/projects/{Id:int}"
+@inject IDbContextFactory<ContractsContext> DbFactory
+@inject NavigationManager Nav
+
+@if (project is null)
+{
+    <p class="text-muted">Завантаження…</p>
+}
+else
+{
+<PageTitle>@project.Name</PageTitle>
+<h3>@project.Name</h3>
+<p class="text-muted">@project.Customer · @project.StartDate.ToString("dd.MM.yyyy") — @project.EndDate.ToString("dd.MM.yyyy")</p>
+<p>@project.Description</p>
+<Toast @ref="toast" />
+
+<div class="card p-3 mb-3">
+    <h5>Учасники проекту</h5>
+    <table class="table mb-0">
+        <thead><tr><th>Працівник</th><th>Посада</th><th class="text-end">Оклад, грн</th><th class="text-end" style="width:160px">Днів участі</th><th style="width:60px"></th></tr></thead>
+        <tbody>
+        @foreach (var pa in members)
+        {
+            <tr>
+                <td>@pa.Employee.FullName</td>
+                <td>@pa.Employee.Position.Title</td>
+                <td class="text-end">@pa.Employee.Position.Salary.ToString("N2")</td>
+                <td><input type="number" min="1" class="form-control form-control-sm text-end" value="@pa.DaysWorked"
+                           @onchange="e => UpdateDays(pa, e.Value?.ToString())" /></td>
+                <td class="text-end"><button class="btn btn-sm btn-outline-danger" @onclick="() => Remove(pa)"><i class="bi bi-x-lg"></i></button></td>
+            </tr>
+        }
+        </tbody>
+        <tfoot>
+            <tr class="fw-bold"><td colspan="3">Разом (@members.Count учасн.)</td><td class="text-end">@members.Sum(m => m.DaysWorked)</td><td></td></tr>
+            <tr class="table-light">
+                <td colspan="3">
+                    <select class="form-select form-select-sm" @bind="newEmployeeId">
+                        <option value="0">— додати працівника —</option>
+                        @foreach (var e in candidates) { <option value="@e.Id">@e.FullName (@e.Position.Title)</option> }
+                    </select>
+                </td>
+                <td><input type="number" min="1" class="form-control form-control-sm text-end" @bind="newDays" /></td>
+                <td class="text-end"><button class="btn btn-sm btn-success" @onclick="Add" disabled="@(newEmployeeId == 0)"><i class="bi bi-plus-lg"></i></button></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+<a href="projects" class="btn btn-outline-secondary">До списку проектів</a>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    Project? project;
+    List<Participation> members = new();
+    List<Employee> candidates = new();
+    int newEmployeeId, newDays = 30;
+    Toast toast = null!;
+
+    protected override async Task OnParametersSetAsync() => await Load();
+
+    async Task Load()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        project = await db.Projects.AsNoTracking().FirstOrDefaultAsync(p => p.Id == Id);
+        if (project is null) { Nav.NavigateTo("projects"); return; }
+        members = await db.Participations.Where(p => p.ProjectId == Id)
+            .Include(p => p.Employee).ThenInclude(e => e.Position)
+            .OrderBy(p => p.Employee.LastName).AsNoTracking().ToListAsync();
+        candidates = await db.Employees.Include(e => e.Position)
+            .Where(e => !e.Participations.Any(p => p.ProjectId == Id))
+            .OrderBy(e => e.LastName).AsNoTracking().ToListAsync();
+    }
+
+    async Task Add()
+    {
+        if (newDays < 1 || newDays > 3650) { toast.Show("Кількість днів — від 1 до 3650", true); return; }
+        await using var db = await DbFactory.CreateDbContextAsync();
+        db.Participations.Add(new Participation { EmployeeId = newEmployeeId, ProjectId = Id, DaysWorked = newDays });
+        await db.SaveChangesAsync();
+        newEmployeeId = 0; newDays = 30;
+        toast.Show("Учасника додано до проекту");
+        await Load();
+    }
+
+    async Task UpdateDays(Participation pa, string? value)
+    {
+        if (!int.TryParse(value, out var days) || days < 1 || days > 3650)
+        { toast.Show("Кількість днів — від 1 до 3650", true); await Load(); return; }
+        await using var db = await DbFactory.CreateDbContextAsync();
+        await db.Participations.Where(p => p.EmployeeId == pa.EmployeeId && p.ProjectId == Id)
+            .ExecuteUpdateAsync(s => s.SetProperty(p => p.DaysWorked, days));
+        toast.Show($"{pa.Employee.LastName}: кількість днів змінено на {days}");
+        await Load();
+    }
+
+    async Task Remove(Participation pa)
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        await db.Participations.Where(p => p.EmployeeId == pa.EmployeeId && p.ProjectId == Id).ExecuteDeleteAsync();
+        toast.Show($"{pa.Employee.FullName} вилучено з проекту");
+        await Load();
+    }
+}

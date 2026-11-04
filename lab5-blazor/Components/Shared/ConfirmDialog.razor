@@ -1,0 +1,21 @@
+@* Повторно використовуваний діалог підтвердження *@
+@if (Visible)
+{
+    <div class="modal-backdrop-custom">
+        <div class="card p-4" style="width: 480px">
+            <h5 class="mb-3"><i class="bi bi-exclamation-triangle text-danger"></i> @Title</h5>
+            <p class="mb-4">@Message</p>
+            <div class="text-end">
+                <button class="btn btn-outline-secondary" @onclick="() => OnClose.InvokeAsync(false)">Скасувати</button>
+                <button class="btn btn-danger" @onclick="() => OnClose.InvokeAsync(true)"><i class="bi bi-trash"></i> Видалити</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public string Title { get; set; } = "Підтвердження";
+    [Parameter] public string Message { get; set; } = "";
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+}
