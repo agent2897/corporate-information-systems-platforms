@@ -9,6 +9,7 @@
 | 3 | ASP.NET Core MVC + EF Core. CRUD «Проектні договори» | [lab3-mvc](lab3-mvc) |
 | 4 | ASP.NET Core Razor Pages + Web API. «Проектні договори» | [lab4-razor-api](lab4-razor-api) |
 | 5 | Blazor + EF Core. CRUD «Проектні договори» | [lab5-blazor](lab5-blazor) |
+| 6 | SignalR — веб-сервіс реального часу. «Проектні договори» | [lab6-signalr](lab6-signalr) |
 
 ## Запуск
 
@@ -19,7 +20,7 @@
 cd lab1-adonet      # або lab2-efcore — застосунки Windows Forms
 dotnet run
 
-cd lab3-mvc         # або lab4-razor-api, lab5-blazor — вебзастосунки
+cd lab3-mvc         # або lab4-razor-api, lab5-blazor, lab6-signalr — вебзастосунки
 dotnet run          # відкрийте адресу з виводу, напр. http://localhost:5000
 ```
 

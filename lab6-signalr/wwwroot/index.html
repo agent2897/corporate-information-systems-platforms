@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Проектні договори — SignalR</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <style>
+        body { background: #f2f5f7; }
+        .card { border: 0; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+        .table td, .table th { vertical-align: middle; }
+        #log { max-height: 520px; overflow-y: auto; font-size: .9rem; }
+        #log li { border-left: 3px solid #0d6efd; padding: 4px 8px; margin-bottom: 6px; background: #fff; }
+        #log li.other { border-left-color: #fd7e14; background: #fff8f0; }
+        tr.flash td { animation: flash 2s; }
+        @keyframes flash { from { background: #fff3cd; } to { background: transparent; } }
+        .toast-box { position: fixed; right: 16px; bottom: 16px; z-index: 2000; max-width: 380px; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark mb-4" style="background:#0b5563">
+    <div class="container">
+        <span class="navbar-brand fw-semibold"><i class="bi bi-briefcase-fill text-warning"></i> Проектні договори <span class="badge text-bg-light">SignalR</span></span>
+        <span class="text-white small">
+            <span id="status" class="badge text-bg-secondary">підключення…</span>
+            <i class="bi bi-person-circle ms-2"></i> <b id="me"></b>
+            <i class="bi bi-people-fill ms-2"></i> онлайн: <b id="online">0</b>
+        </span>
+    </div>
+</nav>
+
+<main class="container pb-5">
+    <div class="row g-4">
+        <div class="col-lg-9">
+            <ul class="nav nav-tabs mb-3" id="tabs">
+                <li class="nav-item"><button class="nav-link active" data-tab="employees">Працівники</button></li>
+                <li class="nav-item"><button class="nav-link" data-tab="positions">Посади</button></li>
+                <li class="nav-item"><button class="nav-link" data-tab="projects">Проекти та участь</button></li>
+            </ul>
+
+            <!-- Працівники -->
+            <section data-pane="employees">
+                <div class="d-flex gap-2 mb-3">
+                    <input id="search" class="form-control" style="max-width:320px" placeholder="Пошук за прізвищем" />
+                    <button class="btn btn-success ms-auto" id="btnNewEmployee"><i class="bi bi-plus-lg"></i> Додати працівника</button>
+                </div>
+                <div class="card"><table class="table table-hover mb-0">
+                    <thead class="table-light"><tr><th>ПІБ</th><th>Посада</th><th>Домашня адреса</th><th>Телефон</th><th class="text-center">Проектів</th><th></th></tr></thead>
+                    <tbody id="employees"></tbody>
+                </table></div>
+            </section>
+
+            <!-- Посади -->
+            <section data-pane="positions" hidden>
+                <div class="card"><table class="table table-hover mb-0">
+                    <thead class="table-light"><tr><th>Посада</th><th class="text-end" style="width:190px">Оклад, грн</th><th class="text-center">Працівників</th><th style="width:120px"></th></tr></thead>
+                    <tbody id="positions"></tbody>
+                    <tfoot><tr class="table-light">
+                        <td><input id="newPosTitle" class="form-control form-control-sm" placeholder="Нова посада" /></td>
+                        <td><input id="newPosSalary" type="number" step="0.01" class="form-control form-control-sm text-end" placeholder="Оклад" /></td>
+                        <td></td>
+                        <td class="text-end"><button class="btn btn-sm btn-success" id="btnAddPosition"><i class="bi bi-plus-lg"></i> Додати</button></td>
+                    </tr></tfoot>
+                </table></div>
+            </section>
+
+            <!-- Проекти -->
+            <section data-pane="projects" hidden>
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <button class="btn btn-success w-100 mb-3" id="btnNewProject"><i class="bi bi-plus-lg"></i> Додати проект</button>
+                        <div id="projects" class="d-grid gap-3"></div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card p-3">
+                            <h5 id="membersTitle">Учасники</h5>
+                            <table class="table mb-0">
+                                <thead><tr><th>Працівник</th><th>Посада</th><th style="width:110px" class="text-end">Днів</th><th></th></tr></thead>
+                                <tbody id="members"></tbody>
+                                <tfoot><tr class="table-light">
+                                    <td colspan="2"><select id="newMember" class="form-select form-select-sm"></select></td>
+                                    <td><input id="newMemberDays" type="number" value="30" class="form-control form-control-sm text-end" /></td>
+                                    <td class="text-end"><button class="btn btn-sm btn-success" id="btnAddMember"><i class="bi bi-plus-lg"></i></button></td>
+                                </tr></tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Стрічка подій у реальному часі -->
+        <div class="col-lg-3">
+            <div class="card p-3 mb-3" id="summary"></div>
+            <div class="card p-3">
+                <h6><i class="bi bi-broadcast"></i> Події в реальному часі</h6>
+                <ul id="log" class="list-unstyled mb-0"><li class="text-muted border-0 bg-transparent">Поки що змін немає</li></ul>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Модальне вікно працівника -->
+<div class="modal fade" id="employeeModal" tabindex="-1"><div class="modal-dialog modal-lg"><form class="modal-content" id="employeeForm" novalidate>
+    <div class="modal-header"><h5 class="modal-title" id="employeeTitle">Працівник</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body row g-3">
+        <div class="col-md-4"><label class="form-label">Прізвище</label><input name="lastName" class="form-control" /></div>
+        <div class="col-md-4"><label class="form-label">Ім’я</label><input name="firstName" class="form-control" /></div>
+        <div class="col-md-4"><label class="form-label">По батькові</label><input name="middleName" class="form-control" /></div>
+        <div class="col-md-6"><label class="form-label">Посада</label><select name="positionId" class="form-select"></select></div>
+        <div class="col-md-6"><label class="form-label">Телефон</label><input name="phone" class="form-control" placeholder="+380XXXXXXXXX" /></div>
+        <div class="col-12"><label class="form-label">Домашня адреса</label><input name="address" class="form-control" /></div>
+        <div class="col-12"><label class="form-label">Характеристика</label><textarea name="characteristic" class="form-control" rows="2"></textarea></div>
+        <div class="col-12"><div class="alert alert-danger mb-0" data-error hidden></div></div>
+    </div>
+    <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Скасувати</button><button class="btn btn-primary"><i class="bi bi-save"></i> Зберегти</button></div>
+</form></div></div>
+
+<!-- Модальне вікно проекту -->
+<div class="modal fade" id="projectModal" tabindex="-1"><div class="modal-dialog modal-lg"><form class="modal-content" id="projectForm" novalidate>
+    <div class="modal-header"><h5 class="modal-title" id="projectTitle">Проект</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body row g-3">
+        <div class="col-md-7"><label class="form-label">Назва проекту</label><input name="name" class="form-control" /></div>
+        <div class="col-md-5"><label class="form-label">Замовник</label><input name="customer" class="form-control" /></div>
+        <div class="col-md-6"><label class="form-label">Дата початку</label><input name="startDate" type="date" class="form-control" /></div>
+        <div class="col-md-6"><label class="form-label">Дата закінчення</label><input name="endDate" type="date" class="form-control" /></div>
+        <div class="col-12"><label class="form-label">Опис проекту</label><textarea name="description" class="form-control" rows="3"></textarea></div>
+        <div class="col-12"><div class="alert alert-danger mb-0" data-error hidden></div></div>
+    </div>
+    <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Скасувати</button><button class="btn btn-primary"><i class="bi bi-save"></i> Зберегти</button></div>
+</form></div></div>
+
+<div class="toast-box" id="toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
