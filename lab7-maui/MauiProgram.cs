@@ -42,7 +42,8 @@ public static class MauiProgram
         var app = builder.Build();
 
         // Створення схеми й початкових даних (HasData) під час першого запуску
-        using (var db = app.Services.GetRequiredService<IDbContextFactory<ContractsContext>>().CreateDbContext())
+        var factory = app.Services.GetRequiredService<IDbContextFactory<ContractsContext>>();
+        using (var db = factory.CreateDbContext())
             db.Database.EnsureCreated();
 
         return app;
