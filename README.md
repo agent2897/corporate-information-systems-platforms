@@ -10,6 +10,7 @@
 | 4 | ASP.NET Core Razor Pages + Web API. «Проектні договори» | [lab4-razor-api](lab4-razor-api) |
 | 5 | Blazor + EF Core. CRUD «Проектні договори» | [lab5-blazor](lab5-blazor) |
 | 6 | SignalR — веб-сервіс реального часу. «Проектні договори» | [lab6-signalr](lab6-signalr) |
+| 7 | .NET MAUI (Android) + EF Core. «Проектні договори» | [lab7-maui](lab7-maui) |
 
 ## Запуск
 
@@ -22,8 +23,11 @@ dotnet run
 
 cd lab3-mvc         # або lab4-razor-api, lab5-blazor, lab6-signalr — вебзастосунки
 dotnet run          # відкрийте адресу з виводу, напр. http://localhost:5000
+
+cd lab7-maui        # мобільний застосунок .NET MAUI (Android, потрібне навантаження maui-android)
+dotnet build -t:Run -f net9.0-android   # запуск на підключеному емуляторі/пристрої
 ```
 
 Структура бази даних (ЛР1) — у файлах [lab1-adonet/Sql/schema.sql](lab1-adonet/Sql/schema.sql) та
-[lab1-adonet/Sql/data.sql](lab1-adonet/Sql/data.sql). У ЛР2–ЛР6 та сама схема описана моделями EF Core
+[lab1-adonet/Sql/data.sql](lab1-adonet/Sql/data.sql). У ЛР2–ЛР7 та сама схема описана моделями EF Core
 (`Models/Entities.cs`, `Data/ContractsContext.cs`, початкові дані — `Data/Seed.cs`).

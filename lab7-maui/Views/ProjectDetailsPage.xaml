@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:m="clr-namespace:ProjectContractsMaui.Models"
+             x:Class="ProjectContractsMaui.Views.ProjectDetailsPage"
+             Title="Проект"
+             BackgroundColor="#f2f5f7">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Змінити" Clicked="OnEdit" />
+    </ContentPage.ToolbarItems>
+    <Grid RowDefinitions="Auto,*,Auto">
+        <Border Style="{StaticResource Card}" Margin="12,12,12,6">
+            <VerticalStackLayout Spacing="4">
+                <Label x:Name="ProjectName" FontAttributes="Bold" FontSize="18" />
+                <Label x:Name="Customer" TextColor="#1f6f78" />
+                <Label x:Name="Description" FontSize="13" TextColor="#555" />
+                <Label x:Name="Period" FontSize="13" />
+                <Label x:Name="Totals" FontSize="13" FontAttributes="Bold" />
+            </VerticalStackLayout>
+        </Border>
+        <CollectionView Grid.Row="1" x:Name="Members" SelectionMode="None">
+            <CollectionView.Header>
+                <Label Text="Учасники (натисніть, щоб змінити дні або вилучити)" Margin="16,6" FontSize="13" TextColor="Gray" />
+            </CollectionView.Header>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="m:MemberItem">
+                    <Border Style="{StaticResource Card}" Margin="12,4" Padding="12,10">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMemberTap" CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Employee}" FontSize="15" />
+                                <Label Text="{Binding Position}" FontSize="12" TextColor="Gray" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="{Binding DaysText}" FontAttributes="Bold" TextColor="#1f6f78" VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Button Grid.Row="2" Text="Додати учасника" Clicked="OnAddMember" BackgroundColor="#2e7d32" Margin="12" />
+    </Grid>
+</ContentPage>

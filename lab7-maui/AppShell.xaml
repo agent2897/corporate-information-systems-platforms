@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell x:Class="ProjectContractsMaui.AppShell"
+       xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:views="clr-namespace:ProjectContractsMaui.Views"
+       Shell.FlyoutBehavior="Disabled"
+       Shell.BackgroundColor="#1f6f78"
+       Shell.ForegroundColor="White"
+       Shell.TitleColor="White"
+       Shell.TabBarBackgroundColor="White"
+       Shell.TabBarForegroundColor="#1f6f78"
+       Shell.TabBarTitleColor="#1f6f78"
+       Shell.TabBarUnselectedColor="#8a8a8a">
+    <TabBar>
+        <ShellContent Title="Огляд" Icon="tab_home.png" ContentTemplate="{DataTemplate views:OverviewPage}" Route="overview" />
+        <ShellContent Title="Працівники" Icon="tab_people.png" ContentTemplate="{DataTemplate views:EmployeesPage}" Route="employees" />
+        <ShellContent Title="Посади" Icon="tab_badge.png" ContentTemplate="{DataTemplate views:PositionsPage}" Route="positions" />
+        <ShellContent Title="Проекти" Icon="tab_folder.png" ContentTemplate="{DataTemplate views:ProjectsPage}" Route="projects" />
+    </TabBar>
+</Shell>

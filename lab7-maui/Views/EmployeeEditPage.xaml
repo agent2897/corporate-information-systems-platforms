@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProjectContractsMaui.Views.EmployeeEditPage"
+             BackgroundColor="#f2f5f7">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="6">
+            <Label Text="Прізвище" Style="{StaticResource FieldLabel}" />
+            <Entry x:Name="LastName" Placeholder="Прізвище" />
+            <Label Text="Ім’я" Style="{StaticResource FieldLabel}" />
+            <Entry x:Name="FirstName" Placeholder="Ім’я" />
+            <Label Text="По батькові" Style="{StaticResource FieldLabel}" />
+            <Entry x:Name="MiddleName" Placeholder="По батькові" />
+            <Label Text="Посада" Style="{StaticResource FieldLabel}" />
+            <Picker x:Name="Position" Title="Оберіть посаду" ItemDisplayBinding="{Binding Title}" />
+            <Label Text="Телефон" Style="{StaticResource FieldLabel}" />
+            <Entry x:Name="Phone" Placeholder="+380XXXXXXXXX" Keyboard="Telephone" />
+            <Label Text="Домашня адреса" Style="{StaticResource FieldLabel}" />
+            <Entry x:Name="Address" Placeholder="Місто, вулиця, будинок" />
+            <Label Text="Характеристика" Style="{StaticResource FieldLabel}" />
+            <Editor x:Name="Characteristic" AutoSize="TextChanges" Placeholder="Коротка характеристика" />
+            <Label x:Name="Errors" TextColor="#c62828" IsVisible="False" Margin="0,8,0,0" />
+            <Label x:Name="ProjectsInfo" TextColor="Gray" FontSize="13" Margin="0,8,0,0" />
+            <Button Text="Зберегти" Clicked="OnSave" BackgroundColor="#1f6f78" Margin="0,12,0,0" />
+            <Button x:Name="DeleteButton" Text="Видалити працівника" Clicked="OnDelete" BackgroundColor="#c62828" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

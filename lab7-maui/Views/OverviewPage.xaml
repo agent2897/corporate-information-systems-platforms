@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProjectContractsMaui.Views.OverviewPage"
+             Title="Проектні договори"
+             BackgroundColor="#f2f5f7">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout><Label Text="Працівників" Style="{StaticResource Muted}" /><Label x:Name="Employees" Style="{StaticResource Big}" /></VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="1" Style="{StaticResource Card}">
+                    <VerticalStackLayout><Label Text="Посад" Style="{StaticResource Muted}" /><Label x:Name="Positions" Style="{StaticResource Big}" /></VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Style="{StaticResource Card}">
+                    <VerticalStackLayout><Label Text="Проектів" Style="{StaticResource Muted}" /><Label x:Name="Projects" Style="{StaticResource Big}" /></VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Card}">
+                    <VerticalStackLayout><Label Text="Фонд окладів, грн" Style="{StaticResource Muted}" /><Label x:Name="Fund" Style="{StaticResource Big}" FontSize="22" /></VerticalStackLayout>
+                </Border>
+            </Grid>
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Працюють у двох проектах одночасно" FontAttributes="Bold" FontSize="16" />
+                    <VerticalStackLayout x:Name="TwoProjects" Spacing="6" />
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

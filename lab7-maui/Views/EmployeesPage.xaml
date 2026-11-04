@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:m="clr-namespace:ProjectContractsMaui.Models"
+             x:Class="ProjectContractsMaui.Views.EmployeesPage"
+             Title="Працівники"
+             BackgroundColor="#f2f5f7">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Додати" Clicked="OnAdd" />
+    </ContentPage.ToolbarItems>
+    <Grid RowDefinitions="Auto,Auto,*">
+        <SearchBar x:Name="Search" Placeholder="Пошук за прізвищем" TextChanged="OnSearch" BackgroundColor="White" />
+        <Label Grid.Row="1" x:Name="Count" Margin="16,6,16,0" FontSize="13" TextColor="Gray" />
+        <CollectionView Grid.Row="2" x:Name="List" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="m:EmployeeItem">
+                    <Border Style="{StaticResource Card}" Margin="12,6">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnTap" CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="{Binding FullName}" FontAttributes="Bold" FontSize="16" />
+                            <Label Text="{Binding Position}" TextColor="#1f6f78" />
+                            <Label Text="{Binding Address}" FontSize="13" TextColor="#555" />
+                            <Label Text="{Binding Info}" FontSize="12" TextColor="Gray" />
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <Label Text="Нічого не знайдено" HorizontalOptions="Center" Margin="0,40" TextColor="Gray" />
+            </CollectionView.EmptyView>
+        </CollectionView>
+    </Grid>
+</ContentPage>
