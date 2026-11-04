@@ -1,0 +1,29 @@
+@page
+@model IndexModel
+@{ ViewData["Title"] = "Головна"; }
+
+<h3 class="mb-3">Огляд бази даних</h3>
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><a class="card p-3 text-decoration-none" asp-page="/Employees/Index"><div class="text-muted"><i class="bi bi-people"></i> Працівників</div><div class="fs-2 fw-bold text-dark">@Model.EmployeeCount</div></a></div>
+    <div class="col-md-3"><a class="card p-3 text-decoration-none" asp-page="/Positions/Index"><div class="text-muted"><i class="bi bi-person-badge"></i> Посад</div><div class="fs-2 fw-bold text-dark">@Model.PositionCount</div></a></div>
+    <div class="col-md-3"><a class="card p-3 text-decoration-none" asp-page="/Projects/Index"><div class="text-muted"><i class="bi bi-kanban"></i> Проектів</div><div class="fs-2 fw-bold text-dark">@Model.ProjectCount</div></a></div>
+    <div class="col-md-3"><div class="card p-3"><div class="text-muted"><i class="bi bi-cash-stack"></i> Фонд окладів, грн</div><div class="fs-2 fw-bold">@Model.Fund.ToString("N0")</div></div></div>
+</div>
+
+<div class="card p-3">
+    <h5>Працівники, які працюють у двох проектах одночасно</h5>
+    <table class="table table-striped mb-0">
+        <thead><tr><th>ПІБ</th><th>Посада</th><th>Проекти (днів)</th><th class="text-end">Усього днів</th></tr></thead>
+        <tbody>
+        @foreach (var e in Model.MultiProject)
+        {
+            <tr>
+                <td>@e.FullName</td>
+                <td>@e.Position.Title</td>
+                <td>@string.Join("; ", e.Participations.Select(p => $"{p.Project.Name} ({p.DaysWorked})"))</td>
+                <td class="text-end">@e.Participations.Sum(p => p.DaysWorked)</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

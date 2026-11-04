@@ -7,3 +7,4 @@
 | 1 | ADO.NET. База даних «Проектні договори» | [lab1-adonet](lab1-adonet) |
 | 2 | Entity Framework Core. База даних «Проектні договори» | [lab2-efcore](lab2-efcore) |
 | 3 | ASP.NET Core MVC + EF Core. CRUD «Проектні договори» | [lab3-mvc](lab3-mvc) |
+| 4 | ASP.NET Core Razor Pages + Web API. «Проектні договори» | [lab4-razor-api](lab4-razor-api) |

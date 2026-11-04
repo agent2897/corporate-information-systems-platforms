@@ -1,0 +1,55 @@
+@page
+@{ ViewData["Title"] = "Проекти"; }
+@* Сторінка працює повністю через Web API (wwwroot/js/projects.js) *@
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Проекти <span class="badge text-bg-light fs-6 align-middle">дані через /api</span></h3>
+    <button class="btn btn-success" id="btnNewProject"><i class="bi bi-plus-lg"></i> Додати проект</button>
+</div>
+<div id="alert"></div>
+
+<div class="row g-4">
+    <div class="col-lg-5"><div id="projectList" class="d-grid gap-3"></div></div>
+    <div class="col-lg-7">
+        <div class="card p-3" id="membersCard">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="m-0" id="membersTitle">Учасники</h5>
+                <button class="btn btn-sm btn-success" id="btnAddMember"><i class="bi bi-person-plus"></i> Додати учасника</button>
+            </div>
+            <table class="table mt-2 mb-0">
+                <thead><tr><th>Працівник</th><th>Посада</th><th class="text-end" style="width:150px">Днів участі</th><th></th></tr></thead>
+                <tbody id="members"></tbody>
+                <tfoot><tr class="fw-bold"><td colspan="2">Разом</td><td class="text-end" id="totalDays"></td><td></td></tr></tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Модальне вікно проекту -->
+<div class="modal fade" id="projectModal" tabindex="-1">
+  <div class="modal-dialog modal-lg"><form class="modal-content" id="projectForm" novalidate>
+    <div class="modal-header"><h5 class="modal-title" id="projectModalTitle">Проект</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body row g-3">
+        <div class="col-md-7"><label class="form-label">Назва проекту</label><input name="name" class="form-control" /><div class="invalid-feedback" data-for="Name"></div></div>
+        <div class="col-md-5"><label class="form-label">Замовник</label><input name="customer" class="form-control" /></div>
+        <div class="col-md-6"><label class="form-label">Дата початку</label><input name="startDate" type="date" class="form-control" /></div>
+        <div class="col-md-6"><label class="form-label">Дата закінчення</label><input name="endDate" type="date" class="form-control" /><div class="invalid-feedback" data-for="EndDate"></div></div>
+        <div class="col-12"><label class="form-label">Опис проекту</label><textarea name="description" class="form-control" rows="3"></textarea></div>
+    </div>
+    <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Скасувати</button><button class="btn btn-primary"><i class="bi bi-save"></i> Зберегти</button></div>
+  </form></div>
+</div>
+
+<!-- Модальне вікно учасника -->
+<div class="modal fade" id="memberModal" tabindex="-1">
+  <div class="modal-dialog"><form class="modal-content" id="memberForm" novalidate>
+    <div class="modal-header"><h5 class="modal-title">Новий учасник проекту</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <div class="mb-3"><label class="form-label">Працівник</label><select name="employeeId" class="form-select"></select><div class="invalid-feedback" data-for="EmployeeId"></div></div>
+        <div class="mb-3"><label class="form-label">Днів у проекті</label><input name="daysWorked" type="number" value="30" class="form-control" /><div class="invalid-feedback" data-for="DaysWorked"></div></div>
+    </div>
+    <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Скасувати</button><button class="btn btn-primary">Додати</button></div>
+  </form></div>
+</div>
+
+@section Scripts { <script src="~/js/projects.js"></script> }
