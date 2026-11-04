@@ -1,0 +1,33 @@
+@model List<Participation>
+@{ ViewData["Title"] = "Участь у проектах"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Участь працівників у проектах</h3>
+    <a asp-action="Create" class="btn btn-success"><i class="bi bi-plus-lg"></i> Додати участь</a>
+</div>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <select name="projectId" asp-items="ViewBag.ProjectList" class="form-select" onchange="this.form.submit()"><option value="">Усі проекти</option></select>
+    </div>
+</form>
+<div class="card">
+<table class="table table-hover mb-0">
+    <thead class="table-light"><tr><th>Проект</th><th>Працівник</th><th>Посада</th><th class="text-end">Днів у проекті</th><th class="text-end">Оклад, грн</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var p in Model)
+    {
+        <tr>
+            <td>@p.Project.Name</td>
+            <td>@p.Employee.FullName</td>
+            <td>@p.Employee.Position.Title</td>
+            <td class="text-end">@p.DaysWorked</td>
+            <td class="text-end">@p.Employee.Position.Salary.ToString("N2")</td>
+            <td class="text-end text-nowrap">
+                <a asp-action="Edit" asp-route-employeeId="@p.EmployeeId" asp-route-projectId="@p.ProjectId" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                <a asp-action="Delete" asp-route-employeeId="@p.EmployeeId" asp-route-projectId="@p.ProjectId" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+</div>

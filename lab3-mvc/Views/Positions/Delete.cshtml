@@ -1,0 +1,12 @@
+@model Position
+@{ ViewData["Title"] = "Видалення посади"; }
+
+<h3 class="mb-3">Видалити посаду?</h3>
+<div class="card p-4" style="max-width: 640px">
+    <p class="fs-5 mb-1"><b>@Model.Title</b> — оклад @Model.Salary.ToString("N2") грн</p>
+    @if (Model.Employees.Count > 0)
+    {
+        <div class="alert alert-warning mt-3 mb-0">Посаду займають @Model.Employees.Count працівн. — спершу змініть їм посаду.</div>
+    }
+    <partial name="_DeleteButtons" />
+</div>

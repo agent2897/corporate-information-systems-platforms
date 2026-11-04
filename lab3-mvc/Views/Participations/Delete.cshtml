@@ -1,0 +1,9 @@
+@model Participation
+@{ ViewData["Title"] = "Видалення участі"; }
+
+<h3 class="mb-3">Видалити запис про участь?</h3>
+<div class="card p-4" style="max-width: 640px">
+    <p class="fs-5 mb-1"><b>@Model.Employee.FullName</b></p>
+    <p class="mb-0">Проект «@Model.Project.Name», днів участі: @Model.DaysWorked</p>
+    <partial name="_DeleteButtons" />
+</div>

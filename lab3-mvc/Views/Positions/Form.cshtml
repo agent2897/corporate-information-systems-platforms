@@ -1,0 +1,13 @@
+@model Position
+@{ var isNew = Model.Id == 0; ViewData["Title"] = isNew ? "Нова посада" : "Редагування посади"; }
+
+<h3 class="mb-3">@ViewData["Title"]</h3>
+<div class="card p-4" style="max-width: 520px">
+<form method="post" asp-action="@(isNew ? "Create" : "Edit")" novalidate>
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3"><label asp-for="Title" class="form-label"></label><input asp-for="Title" class="form-control" /><span asp-validation-for="Title" class="text-danger small"></span></div>
+    <div class="mb-3"><label asp-for="Salary" class="form-label"></label><input asp-for="Salary" type="number" step="0.01" class="form-control" /><span asp-validation-for="Salary" class="text-danger small"></span></div>
+    <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Зберегти</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+</form>
+</div>

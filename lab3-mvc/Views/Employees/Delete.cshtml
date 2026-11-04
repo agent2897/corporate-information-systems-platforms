@@ -1,0 +1,13 @@
+@model Employee
+@{ ViewData["Title"] = "Видалення працівника"; }
+
+<h3 class="mb-3">Видалити працівника?</h3>
+<div class="card p-4" style="max-width: 640px">
+    <p class="fs-5 mb-1"><b>@Model.FullName</b> — @Model.Position.Title</p>
+    <p class="text-muted mb-0">@Model.Address</p>
+    @if (Model.Participations.Count > 0)
+    {
+        <div class="alert alert-warning mt-3 mb-0">Разом з працівником буде видалено @Model.Participations.Count запис(и) про участь у проектах.</div>
+    }
+    <partial name="_DeleteButtons" />
+</div>

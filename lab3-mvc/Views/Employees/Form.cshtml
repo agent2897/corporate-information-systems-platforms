@@ -1,0 +1,27 @@
+@model Employee
+@{ var isNew = Model.Id == 0; ViewData["Title"] = isNew ? "Новий працівник" : "Редагування працівника"; }
+
+<h3 class="mb-3">@ViewData["Title"]</h3>
+<div class="card p-4" style="max-width: 760px">
+<form method="post" asp-action="@(isNew ? "Create" : "Edit")" novalidate>
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="row g-3">
+        <div class="col-md-4"><label asp-for="LastName" class="form-label"></label><input asp-for="LastName" class="form-control" /><span asp-validation-for="LastName" class="text-danger small"></span></div>
+        <div class="col-md-4"><label asp-for="FirstName" class="form-label"></label><input asp-for="FirstName" class="form-control" /><span asp-validation-for="FirstName" class="text-danger small"></span></div>
+        <div class="col-md-4"><label asp-for="MiddleName" class="form-label"></label><input asp-for="MiddleName" class="form-control" /><span asp-validation-for="MiddleName" class="text-danger small"></span></div>
+        <div class="col-md-6">
+            <label asp-for="PositionId" class="form-label"></label>
+            <select asp-for="PositionId" asp-items="ViewBag.PositionList" class="form-select"><option value="0">— оберіть посаду —</option></select>
+            <span asp-validation-for="PositionId" class="text-danger small"></span>
+        </div>
+        <div class="col-md-6"><label asp-for="Phone" class="form-label"></label><input asp-for="Phone" class="form-control" placeholder="+380XXXXXXXXX" /><span asp-validation-for="Phone" class="text-danger small"></span></div>
+        <div class="col-12"><label asp-for="Address" class="form-label"></label><input asp-for="Address" class="form-control" /><span asp-validation-for="Address" class="text-danger small"></span></div>
+        <div class="col-12"><label asp-for="Characteristic" class="form-label"></label><textarea asp-for="Characteristic" class="form-control" rows="2"></textarea></div>
+    </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Зберегти</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+    </div>
+</form>
+</div>

@@ -1,0 +1,26 @@
+@model Participation
+@{ bool isEdit = ViewBag.IsEdit == true; ViewData["Title"] = isEdit ? "Редагування участі" : "Нова участь у проекті"; }
+
+<h3 class="mb-3">@ViewData["Title"]</h3>
+<div class="card p-4" style="max-width: 560px">
+<form method="post" asp-action="@(isEdit ? "Edit" : "Create")" novalidate>
+    @if (isEdit)
+    {
+        <input type="hidden" asp-for="EmployeeId" />
+        <input type="hidden" asp-for="ProjectId" />
+    }
+    <div class="mb-3">
+        <label asp-for="EmployeeId" class="form-label"></label>
+        <select asp-for="EmployeeId" asp-items="ViewBag.EmployeeList" class="form-select" disabled="@isEdit"><option value="0">— оберіть працівника —</option></select>
+        <span asp-validation-for="EmployeeId" class="text-danger small"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="ProjectId" class="form-label"></label>
+        <select asp-for="ProjectId" asp-items="ViewBag.ProjectList" class="form-select" disabled="@isEdit"><option value="0">— оберіть проект —</option></select>
+        <span asp-validation-for="ProjectId" class="text-danger small"></span>
+    </div>
+    <div class="mb-3"><label asp-for="DaysWorked" class="form-label"></label><input asp-for="DaysWorked" class="form-control" /><span asp-validation-for="DaysWorked" class="text-danger small"></span></div>
+    <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Зберегти</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+</form>
+</div>

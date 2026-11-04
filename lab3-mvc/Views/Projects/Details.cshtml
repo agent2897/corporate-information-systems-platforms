@@ -1,0 +1,23 @@
+@model Project
+@{ ViewData["Title"] = Model.Name; }
+
+<h3>@Model.Name</h3>
+<p class="text-muted">@Model.Customer · @Model.StartDate.ToString("dd.MM.yyyy") — @Model.EndDate.ToString("dd.MM.yyyy")</p>
+<p>@Model.Description</p>
+<div class="card p-3 mb-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <h5 class="m-0">Учасники проекту</h5>
+        <a asp-controller="Participations" asp-action="Create" asp-route-projectId="@Model.Id" class="btn btn-sm btn-success"><i class="bi bi-plus-lg"></i> Додати учасника</a>
+    </div>
+    <table class="table mt-2 mb-0">
+        <thead><tr><th>Працівник</th><th>Посада</th><th class="text-end">Днів участі</th></tr></thead>
+        <tbody>
+        @foreach (var pa in Model.Participations.OrderBy(x => x.Employee.LastName))
+        {
+            <tr><td>@pa.Employee.FullName</td><td>@pa.Employee.Position.Title</td><td class="text-end">@pa.DaysWorked</td></tr>
+        }
+        </tbody>
+        <tfoot><tr class="fw-bold"><td colspan="2">Разом</td><td class="text-end">@Model.Participations.Sum(x => x.DaysWorked)</td></tr></tfoot>
+    </table>
+</div>
+<a asp-action="Index" class="btn btn-outline-secondary">До списку</a>

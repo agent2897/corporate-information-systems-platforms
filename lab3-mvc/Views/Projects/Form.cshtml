@@ -1,0 +1,20 @@
+@model Project
+@{ var isNew = Model.Id == 0; ViewData["Title"] = isNew ? "Новий проект" : "Редагування проекту"; }
+
+<h3 class="mb-3">@ViewData["Title"]</h3>
+<div class="card p-4" style="max-width: 760px">
+<form method="post" asp-action="@(isNew ? "Create" : "Edit")" novalidate>
+    <input type="hidden" asp-for="Id" />
+    <div class="row g-3">
+        <div class="col-md-7"><label asp-for="Name" class="form-label"></label><input asp-for="Name" class="form-control" /><span asp-validation-for="Name" class="text-danger small"></span></div>
+        <div class="col-md-5"><label asp-for="Customer" class="form-label"></label><input asp-for="Customer" class="form-control" /></div>
+        <div class="col-md-6"><label asp-for="StartDate" class="form-label"></label><input asp-for="StartDate" class="form-control" /><span asp-validation-for="StartDate" class="text-danger small"></span></div>
+        <div class="col-md-6"><label asp-for="EndDate" class="form-label"></label><input asp-for="EndDate" class="form-control" /><span asp-validation-for="EndDate" class="text-danger small"></span></div>
+        <div class="col-12"><label asp-for="Description" class="form-label"></label><textarea asp-for="Description" class="form-control" rows="3"></textarea></div>
+    </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Зберегти</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+    </div>
+</form>
+</div>

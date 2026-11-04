@@ -1,0 +1,37 @@
+@model List<Employee>
+@{ ViewData["Title"] = "Головна"; }
+
+<h3 class="mb-3">Огляд бази даних</h3>
+<div class="row g-3 mb-4">
+    @foreach (var (label, value, icon, link) in new[] {
+        ("Працівників", ViewBag.Employees.ToString(), "people", "Employees"),
+        ("Посад", ViewBag.Positions.ToString(), "person-badge", "Positions"),
+        ("Проектів", ViewBag.Projects.ToString(), "kanban", "Projects"),
+        ("Фонд окладів, грн", ((decimal)ViewBag.Fund).ToString("N0"), "cash-stack", "Positions") })
+    {
+        <div class="col-md-3">
+            <a class="card p-3 text-decoration-none" asp-controller="@link" asp-action="Index">
+                <div class="text-muted"><i class="bi bi-@icon"></i> @label</div>
+                <div class="fs-2 fw-bold text-dark">@value</div>
+            </a>
+        </div>
+    }
+</div>
+
+<div class="card p-3">
+    <h5>Працівники, які працюють у двох проектах одночасно</h5>
+    <table class="table table-striped mb-0">
+        <thead><tr><th>ПІБ</th><th>Посада</th><th>Проекти (днів)</th><th class="text-end">Усього днів</th></tr></thead>
+        <tbody>
+        @foreach (var e in Model)
+        {
+            <tr>
+                <td><a asp-controller="Employees" asp-action="Details" asp-route-id="@e.Id">@e.FullName</a></td>
+                <td>@e.Position.Title</td>
+                <td>@string.Join("; ", e.Participations.Select(p => $"{p.Project.Name} ({p.DaysWorked})"))</td>
+                <td class="text-end">@e.Participations.Sum(p => p.DaysWorked)</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
