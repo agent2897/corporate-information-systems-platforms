@@ -13,7 +13,7 @@
 
 ## Запуск
 
-Потрібен [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) (Windows для ЛР1–ЛР2, будь-яка ОС для ЛР3–ЛР5).
+Потрібен [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) (Windows для ЛР1–ЛР2, будь-яка ОС для ЛР3–ЛР6).
 Окремий сервер БД не потрібен: використовується SQLite, файл бази створюється й наповнюється автоматично під час першого запуску.
 
 ```bash
@@ -25,5 +25,5 @@ dotnet run          # відкрийте адресу з виводу, напр.
 ```
 
 Структура бази даних (ЛР1) — у файлах [lab1-adonet/Sql/schema.sql](lab1-adonet/Sql/schema.sql) та
-[lab1-adonet/Sql/data.sql](lab1-adonet/Sql/data.sql). У ЛР2–ЛР5 та сама схема описана моделями EF Core
+[lab1-adonet/Sql/data.sql](lab1-adonet/Sql/data.sql). У ЛР2–ЛР6 та сама схема описана моделями EF Core
 (`Models/Entities.cs`, `Data/ContractsContext.cs`, початкові дані — `Data/Seed.cs`).
