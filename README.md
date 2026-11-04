@@ -5,3 +5,4 @@
 | № | Тема | Папка |
 |---|------|-------|
 | 1 | ADO.NET. База даних «Проектні договори» | [lab1-adonet](lab1-adonet) |
+| 2 | Entity Framework Core. База даних «Проектні договори» | [lab2-efcore](lab2-efcore) |
