@@ -5,3 +5,5 @@ obj/
 dist/
 *.pdf
 *.db
+*.db-shm
+*.db-wal
